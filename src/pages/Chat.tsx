@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cardinalButtonVariants } from "@/components/ui/button-variants";
 import { Send, Mic } from "lucide-react";
 import { useState } from "react";
+import { toast } from "@/hooks/use-toast";
 
 export default function Chat() {
   const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([
@@ -15,22 +16,93 @@ export default function Chat() {
   ]);
   const [input, setInput] = useState("");
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
     
-    setMessages([...messages, { role: "user", content: input }]);
+    const userMessage = { role: "user" as const, content: input };
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInput("");
-    
-    // Simulate AI response
-    setTimeout(() => {
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ messages: newMessages }),
+        }
+      );
+
+      if (!response.ok || !response.body) {
+        throw new Error("Failed to get AI response");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let assistantContent = "";
+      let textBuffer = "";
+
+      // Add empty assistant message
+      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        textBuffer += decoder.decode(value, { stream: true });
+        let newlineIndex: number;
+        
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") break;
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              assistantContent += content;
+              setMessages((prev) => {
+                const updated = [...prev];
+                updated[updated.length - 1] = { role: "assistant", content: assistantContent };
+                return updated;
+              });
+            }
+          } catch {
+            continue;
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Chat error:", error);
+      toast({
+        title: "Connection Error",
+        description: error instanceof Error ? error.message : "Failed to connect to AI. Please try again.",
+        variant: "destructive",
+      });
       setMessages((prev) => [
-        ...prev,
+        ...prev.slice(0, -1),
         {
           role: "assistant",
-          content: "I'm here to help with business strategy, LLC formation, branding, and more. This is a demo response - full AI integration coming soon with Lovable AI.",
+          content: "I apologize, but I encountered an error. Please try again.",
         },
       ]);
-    }, 1000);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -79,13 +151,15 @@ export default function Chat() {
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleSend()}
+                  onKeyPress={(e) => e.key === "Enter" && !isLoading && handleSend()}
                   placeholder="Ask about LLC formation, branding, strategy..."
                   className="flex-1 bg-background/50 border-border/50 focus:border-cardinal-red"
+                  disabled={isLoading}
                 />
                 <Button
                   onClick={handleSend}
                   className={cardinalButtonVariants({ variant: "hero", size: "icon" })}
+                  disabled={isLoading}
                 >
                   <Send className="w-5 h-5" />
                 </Button>
@@ -111,6 +185,7 @@ export default function Chat() {
                 variant="outline"
                 className="glass hover:glow-border"
                 onClick={() => setInput(action)}
+                disabled={isLoading}
               >
                 {action}
               </Button>
