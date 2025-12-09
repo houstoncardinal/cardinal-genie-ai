@@ -58,40 +58,42 @@ export const HeroSection = () => {
                 <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
-            <Button 
-              className={cardinalButtonVariants({ variant: "glass", size: "lg" })}
-            >
-              <Zap className="w-5 h-5" />
-              Explore Features
-            </Button>
+            <Link to="/services">
+              <Button 
+                className={cardinalButtonVariants({ variant: "glass", size: "lg" })}
+              >
+                <Zap className="w-5 h-5" />
+                Explore Features
+              </Button>
+            </Link>
           </div>
           
           {/* Features Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-16 max-w-4xl mx-auto">
-            <div className="glass p-6 rounded-xl hover:glow-border transition-all">
+            <Link to="/chat" className="glass p-6 rounded-xl hover:glow-border transition-all group">
               <h3 className="font-display text-lg font-semibold mb-2 text-cardinal-red">
                 Expert Business Advice
               </h3>
               <p className="text-sm text-muted-foreground">
                 LLC formation, tax structures, and strategic planning powered by advanced AI
               </p>
-            </div>
-            <div className="glass p-6 rounded-xl hover:glow-border transition-all">
+            </Link>
+            <Link to="/llc-formation" className="glass p-6 rounded-xl hover:glow-border transition-all group">
               <h3 className="font-display text-lg font-semibold mb-2 text-cardinal-red">
-                3D Voice Interface
+                LLC Formation Wizard
               </h3>
               <p className="text-sm text-muted-foreground">
-                Interact with a hyper-realistic AI avatar that speaks and responds naturally
+                Form your business entity in any state with guided document generation
               </p>
-            </div>
-            <div className="glass p-6 rounded-xl hover:glow-border transition-all">
+            </Link>
+            <Link to="/brand-generator" className="glass p-6 rounded-xl hover:glow-border transition-all group">
               <h3 className="font-display text-lg font-semibold mb-2 text-cardinal-red">
                 Brand Generation
               </h3>
               <p className="text-sm text-muted-foreground">
                 Create complete brand identities, logos, and marketing materials instantly
               </p>
-            </div>
+            </Link>
           </div>
         </div>
       </div>

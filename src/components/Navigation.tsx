@@ -29,8 +29,14 @@ export const Navigation = () => {
             <Link to="/brand-generator" className="text-sm font-medium hover:text-cardinal-red transition-colors">
               Brand Generator
             </Link>
-            <Link to="/" className="text-sm font-medium hover:text-cardinal-red transition-colors">
-              Home
+            <Link to="/business-plan" className="text-sm font-medium hover:text-cardinal-red transition-colors">
+              Business Plan
+            </Link>
+            <Link to="/llc-formation" className="text-sm font-medium hover:text-cardinal-red transition-colors">
+              LLC Formation
+            </Link>
+            <Link to="/services" className="text-sm font-medium hover:text-cardinal-red transition-colors">
+              All Services
             </Link>
           </div>
           
