@@ -179,12 +179,16 @@ export default function Chat() {
               "Create a Brand",
               "Tax Structure",
               "Business Plan",
+              "Marketing Strategy",
+              "Investor Pitch",
+              "Financial Projections",
+              "Growth Strategy",
             ].map((action) => (
               <Button
                 key={action}
                 variant="outline"
                 className="glass hover:glow-border"
-                onClick={() => setInput(action)}
+                onClick={() => setInput(`Help me with: ${action}`)}
                 disabled={isLoading}
               >
                 {action}
