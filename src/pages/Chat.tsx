@@ -3,20 +3,38 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cardinalButtonVariants } from "@/components/ui/button-variants";
-import { Send, Mic } from "lucide-react";
-import { useState } from "react";
+import { MessageRenderer } from "@/components/MessageRenderer";
+import { Send, Mic, Sparkles } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 
 export default function Chat() {
   const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([
     {
       role: "assistant",
-      content: "Welcome to Cardinal Business Genie. I'm your AI partner in building empires. How can I assist you with your business today?",
+      content: `## Welcome to Cardinal Business Genie 🎯
+
+I'm your **AI partner** in building empires. I can help you with:
+
+- **LLC Formation** - State selection, documents, compliance
+- **Business Planning** - Strategies, financial projections, market analysis
+- **Branding & Marketing** - Identity, positioning, growth tactics
+- **Tax Structures** - LLC vs S-Corp vs C-Corp comparisons
+- **Investor Relations** - Pitch decks, valuations, fundraising
+
+How can I assist you today?`,
     },
   ]);
   const [input, setInput] = useState("");
-
   const [isLoading, setIsLoading] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -124,7 +142,7 @@ export default function Chat() {
           {/* Chat Container */}
           <div className="glass-strong rounded-2xl overflow-hidden shadow-deep">
             {/* Messages */}
-            <ScrollArea className="h-[60vh] p-6">
+            <ScrollArea className="h-[60vh] p-6" ref={scrollRef}>
               <div className="space-y-6">
                 {messages.map((message, index) => (
                   <div
@@ -132,16 +150,30 @@ export default function Chat() {
                     className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[80%] p-4 rounded-2xl ${
+                      className={`max-w-[85%] rounded-2xl ${
                         message.role === "user"
-                          ? "bg-gradient-cardinal text-white"
-                          : "glass border border-border/50"
+                          ? "bg-gradient-cardinal text-white p-4"
+                          : "glass border border-border/50 p-5"
                       }`}
                     >
-                      <p className="text-sm leading-relaxed">{message.content}</p>
+                      {message.role === "user" ? (
+                        <p className="text-sm leading-relaxed">{message.content}</p>
+                      ) : (
+                        <MessageRenderer content={message.content} />
+                      )}
                     </div>
                   </div>
                 ))}
+                {isLoading && messages[messages.length - 1]?.role !== "assistant" && (
+                  <div className="flex justify-start">
+                    <div className="glass border border-border/50 p-5 rounded-2xl">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 animate-pulse text-cardinal-red" />
+                        <span className="text-sm text-muted-foreground">Thinking...</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </ScrollArea>
             
