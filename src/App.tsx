@@ -8,6 +8,7 @@ import Chat from "./pages/Chat";
 import BrandGenerator from "./pages/BrandGenerator";
 import BusinessPlan from "./pages/BusinessPlan";
 import LLCFormation from "./pages/LLCFormation";
+import PitchDeck from "./pages/PitchDeck";
 import Services from "./pages/Services";
 import NotFound from "./pages/NotFound";
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/brand-generator" element={<BrandGenerator />} />
           <Route path="/business-plan" element={<BusinessPlan />} />
           <Route path="/llc-formation" element={<LLCFormation />} />
+          <Route path="/pitch-deck" element={<PitchDeck />} />
           <Route path="/services" element={<Services />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
