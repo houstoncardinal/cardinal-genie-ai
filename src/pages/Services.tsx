@@ -12,6 +12,8 @@ import {
   TrendingUp
 } from "lucide-react";
 
+import { Presentation } from "lucide-react";
+
 const services = [
   {
     icon: MessageSquare,
@@ -42,6 +44,13 @@ const services = [
     linkText: "Start Formation"
   },
   {
+    icon: Presentation,
+    title: "Pitch Deck Generator",
+    description: "Create investor-ready pitch decks with compelling slides for problem, solution, market opportunity, financials, and the ask.",
+    link: "/pitch-deck",
+    linkText: "Create Pitch"
+  },
+  {
     icon: Calculator,
     title: "Financial Calculator",
     description: "Calculate startup costs, revenue projections, break-even analysis, and funding requirements with our intelligent financial tools.",
@@ -66,7 +75,7 @@ const services = [
     icon: Users,
     title: "Investor Pitch Prep",
     description: "Prepare for investor meetings with pitch deck templates, valuation guidance, and practice Q&A sessions with our AI consultant.",
-    link: "/chat",
+    link: "/pitch-deck",
     linkText: "Prepare Pitch"
   },
   {

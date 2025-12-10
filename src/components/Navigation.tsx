@@ -22,20 +22,23 @@ export const Navigation = () => {
           </Link>
           
           {/* Navigation Links */}
-          <div className="hidden md:flex items-center gap-8">
-            <Link to="/chat" className="text-sm font-medium hover:text-cardinal-red transition-colors">
+          <div className="hidden lg:flex items-center gap-6">
+            <Link to="/chat" className="text-sm font-medium hover:text-primary transition-colors">
               AI Assistant
             </Link>
-            <Link to="/brand-generator" className="text-sm font-medium hover:text-cardinal-red transition-colors">
-              Brand Generator
+            <Link to="/brand-generator" className="text-sm font-medium hover:text-primary transition-colors">
+              Branding
             </Link>
-            <Link to="/business-plan" className="text-sm font-medium hover:text-cardinal-red transition-colors">
+            <Link to="/business-plan" className="text-sm font-medium hover:text-primary transition-colors">
               Business Plan
             </Link>
-            <Link to="/llc-formation" className="text-sm font-medium hover:text-cardinal-red transition-colors">
+            <Link to="/llc-formation" className="text-sm font-medium hover:text-primary transition-colors">
               LLC Formation
             </Link>
-            <Link to="/services" className="text-sm font-medium hover:text-cardinal-red transition-colors">
+            <Link to="/pitch-deck" className="text-sm font-medium hover:text-primary transition-colors">
+              Pitch Deck
+            </Link>
+            <Link to="/services" className="text-sm font-medium hover:text-primary transition-colors">
               All Services
             </Link>
           </div>
