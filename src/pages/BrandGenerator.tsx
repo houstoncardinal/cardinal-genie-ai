@@ -39,30 +39,53 @@ const BrandGenerator = () => {
       // Generate brand identity using AI
       const { data, error } = await supabase.functions.invoke("chat", {
         body: {
-          message: `Generate a complete brand identity for a business called "${businessName}" in the ${industry} industry. ${description ? `Business description: ${description}.` : ""} ${style ? `Preferred style: ${style}.` : ""}
+          messages: [
+            {
+              role: "user",
+              content: `Generate a complete brand identity for a business called "${businessName}" in the ${industry} industry. ${description ? `Business description: ${description}.` : ""} ${style ? `Preferred style: ${style}.` : ""}
           
-          Respond ONLY with a JSON object in this exact format (no markdown, no code blocks, just pure JSON):
-          {
-            "tagline": "A catchy tagline for the brand",
-            "colors": [
-              {"name": "Primary", "hex": "#hexcode"},
-              {"name": "Secondary", "hex": "#hexcode"},
-              {"name": "Accent", "hex": "#hexcode"},
-              {"name": "Background", "hex": "#hexcode"}
-            ],
-            "fonts": {
-              "heading": "Font name for headings",
-              "body": "Font name for body text"
-            },
-            "tone": "Description of the brand voice and tone"
-          }`,
+Respond ONLY with a JSON object in this exact format (no markdown, no code blocks, just pure JSON):
+{
+  "tagline": "A catchy tagline for the brand",
+  "colors": [
+    {"name": "Primary", "hex": "#hexcode"},
+    {"name": "Secondary", "hex": "#hexcode"},
+    {"name": "Accent", "hex": "#hexcode"},
+    {"name": "Background", "hex": "#hexcode"}
+  ],
+  "fonts": {
+    "heading": "Font name for headings",
+    "body": "Font name for body text"
+  },
+  "tone": "Description of the brand voice and tone"
+}`
+            }
+          ],
         },
       });
 
       if (error) throw error;
 
-      // Parse the AI response
-      const responseText = data.response;
+      // Parse the streamed AI response
+      let responseText = "";
+      if (typeof data === "string") {
+        // Parse SSE stream data
+        const lines = data.split("\n");
+        for (const line of lines) {
+          if (line.startsWith("data: ") && line !== "data: [DONE]") {
+            try {
+              const json = JSON.parse(line.slice(6));
+              const content = json.choices?.[0]?.delta?.content;
+              if (content) responseText += content;
+            } catch (e) {
+              // Skip invalid JSON
+            }
+          }
+        }
+      } else if (data?.choices?.[0]?.message?.content) {
+        responseText = data.choices[0].message.content;
+      }
+      
       const jsonMatch = responseText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const brandData = JSON.parse(jsonMatch[0]);
@@ -71,6 +94,8 @@ const BrandGenerator = () => {
           title: "Brand Generated!",
           description: "Your brand identity has been created successfully.",
         });
+      } else {
+        throw new Error("Could not parse brand data from AI response");
       }
 
       // Generate logo
