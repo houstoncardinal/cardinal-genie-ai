@@ -37,13 +37,13 @@ const BrandGenerator = () => {
 
     try {
       // Generate brand identity using AI
-      const { data, error } = await supabase.functions.invoke("chat", {
+      const { data, error } = await supabase.functions.invoke("generate-brand", {
         body: {
           messages: [
             {
               role: "user",
               content: `Generate a complete brand identity for a business called "${businessName}" in the ${industry} industry. ${description ? `Business description: ${description}.` : ""} ${style ? `Preferred style: ${style}.` : ""}
-          
+
 Respond ONLY with a JSON object in this exact format (no markdown, no code blocks, just pure JSON):
 {
   "tagline": "A catchy tagline for the brand",
@@ -66,25 +66,7 @@ Respond ONLY with a JSON object in this exact format (no markdown, no code block
 
       if (error) throw error;
 
-      // Parse the streamed AI response
-      let responseText = "";
-      if (typeof data === "string") {
-        // Parse SSE stream data
-        const lines = data.split("\n");
-        for (const line of lines) {
-          if (line.startsWith("data: ") && line !== "data: [DONE]") {
-            try {
-              const json = JSON.parse(line.slice(6));
-              const content = json.choices?.[0]?.delta?.content;
-              if (content) responseText += content;
-            } catch (e) {
-              // Skip invalid JSON
-            }
-          }
-        }
-      } else if (data?.choices?.[0]?.message?.content) {
-        responseText = data.choices[0].message.content;
-      }
+      const responseText = data?.choices?.[0]?.message?.content || "";
       
       const jsonMatch = responseText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
